@@ -39,16 +39,11 @@ app.get("/api/notes", (request, response) => {
   });
 });
 
-app.get("/api/notes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const note = notes.find((note) => note.id === id);
-  if (note) {
-    response.json(note);
-  } else {
-    response.status(404).end();
-    /* response.status(404).send("La página no se ha encontrado"); */
-  }
-});
+app.get('/api/notes/:id', (request, response) => {
+  Note.findById(request.params.id).then(note => {
+    response.json(note)
+  })
+})
 
 app.delete("/api/notes/:id", (request, response) => {
   const id = Number(request.params.id);
@@ -57,30 +52,24 @@ app.delete("/api/notes/:id", (request, response) => {
   response.status(204).end();
 });
 
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
-  return maxId + 1;
-};
 
-app.post("/api/notes", (request, response) => {
-  const body = request.body;
-  console.log(body);
-  if (!body.content) {
-    return response.status(400).json({
-      error: "content missing",
-    });
+
+app.post('/api/notes', (request, response) => {
+  const body = request.body
+
+  if (body.content === undefined) {
+    return response.status(400).json({ error: 'content missing' })
   }
 
-  const note = {
+  const note = new Note({
     content: body.content,
-    important: Boolean(body.important) || false,
-    id: generateId(),
-  };
+    important: body.important || false,
+  })
 
-  notes = notes.concat(note);
-
-  response.json(note);
-});
+  note.save().then(savedNote => {
+    response.json(savedNote)
+  })
+})
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

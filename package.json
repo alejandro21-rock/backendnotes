@@ -12,6 +12,7 @@
     "test": "cross-env NODE_ENV=test node --env-file=.env --test"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "express-async-errors": "^3.1.1",
